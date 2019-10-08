@@ -1,5 +1,5 @@
 ﻿using System;
-
+//this is just a test to see if I can use Git Bash correctly.
 public class Individual
 {
     public int fitness;
