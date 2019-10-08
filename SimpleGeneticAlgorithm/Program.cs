@@ -11,12 +11,13 @@ namespace SimpleGeneticAlgorithm
             const int generations = 50;
             const int popSize = 50;
             const int nOfBits = 50;
-            const int mutationThreshold = 10; //percentage mutation chance
+            const int mutationThreshold = 1; //percentage mutation chance
 
             Population parent = new Population("Parent", popSize, nOfBits, mutationThreshold);
             Population offspring = new Population("Offspring", popSize, nOfBits, mutationThreshold);
+
             parent.GeneratePopulation();
-            //parent.DisplayPopulation();
+            //parent.DisplayPopulation(0);
             //parent.DisplayFitnessStats();
 
             offspring.GeneratePopulation();
@@ -25,20 +26,18 @@ namespace SimpleGeneticAlgorithm
 
             for (int i = 1; i <= generations; i++)
             {
-                parent.TournamentSelection(offspring);
+                parent.TournamentSelection(offspring, false);
 
                 offspring.SinglePointCrossover();
-                offspring.Mutate();
+                offspring.Mutate(false);
 
-                offspring.DisplayFitnessStats(i,true);
+                offspring.EvaluateFitness();
+                offspring.DisplayFitnessStats(i, true);
 
                 offspring.SwitchPopulationTo(parent);
             }
         }
-
         //--------------------------------------------------------------------------//
         //--------------------------------------------------------------------------//
-
-              
     }
 }

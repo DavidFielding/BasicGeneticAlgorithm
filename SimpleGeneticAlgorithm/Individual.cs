@@ -2,7 +2,6 @@
 
 public class Individual
 {
-
     public int fitness;
     public bool[] gene;
     public int crossOverPoint;

@@ -45,13 +45,14 @@ public class Population
     }
 
 
-    public void DisplayPopulation()
+    public void DisplayPopulation(int generation)
     {
+        Console.WriteLine("{0}) ", generation);
+
         for (int p = 0; p < popSize; p++)
         {
             for (int n = 0; n < nOfBits; n++)
             {
-                //Console.Write(population[p].gene[n]);
                 int temp = 0;
                 if (population[p].gene[n]) { temp = 1; }
                 else { temp = 0; }
@@ -59,6 +60,7 @@ public class Population
             }
             Console.WriteLine(", fitness: " + population[p].fitness);
         }
+        Console.WriteLine();
     }
 
 
@@ -87,25 +89,33 @@ public class Population
         }
     }
 
-    public void TournamentSelection(Population offspringPopulation)
+    public void TournamentSelection(Population offspringPopulation, bool display)
     {
         int parent1;
         int parent2;
+        int newParent;
 
         for (int p = 0; p < popSize; p++)
         {
             parent1 = random.Next() % popSize;
             parent2 = random.Next() % popSize;
 
+            if (display) { Console.WriteLine("tournament selection: {0}, {1}.", parent1, parent2); }
+
             if (population[parent1].fitness >= population[parent2].fitness)
             {
-                offspringPopulation.population[p] = population[parent1];
-
+                newParent = parent1;
             }
             else
             {
-                offspringPopulation.population[p] = population[parent2];
+                newParent = parent2;
             }
+
+            for(int g = 0; g< nOfBits; g++)
+            {
+                offspringPopulation.population[p].gene[g] = population[newParent].gene[g];
+            }
+            offspringPopulation.population[p].fitness = population[p].fitness;
         }
     }
 
@@ -133,11 +143,9 @@ public class Population
                 population[parent2].crossOverPoint = randomPoint;
             }
         }
-
-        EvaluateFitness();
     }
 
-    public void Mutate()
+    public void Mutate(bool display)
     {
         int randomMutationValue;
 
@@ -150,17 +158,15 @@ public class Population
                 if (randomMutationValue < mutationThreshold)
                 {
                     population[p].gene[g] ^= true;
-                    //Console.Write("v");
+                    if (display) { Console.Write("v"); }
                 }
                 else
                 {
-                    //Console.Write(" ");
+                    if (display) { Console.Write(" "); }
                 }
             }
         }
-        //Console.WriteLine();
-
-        EvaluateFitness();
+        if (display) { Console.WriteLine(); }
     }
 
     private bool RandomBinary()
@@ -172,7 +178,11 @@ public class Population
     {
         for (int p = 0; p < popSize; p++)
         {
-            newPopulation.population[p] = population[p];
+            for(int g = 0; g < nOfBits; g++)
+            {
+                newPopulation.population[p].gene[g] = population[p].gene[g];
+            }
+            newPopulation.population[p].fitness = population[p].fitness;
         }
     }
 }
