@@ -11,6 +11,7 @@ public class Population
     public int popSize;
     public int nOfBits;
     int mutationThreshold;
+    int totalFitness;
 
     public Population(string populationName, int pop, int nBits, int threshold)
     {
@@ -38,10 +39,15 @@ public class Population
 
     public void EvaluateFitness()
     {
+        int sum = 0;
+
         for (int p = 0; p < popSize; p++)
         {
             population[p].FitnessCountingOnes();
+            sum += population[p].fitness;
         }
+
+        this.totalFitness = sum;
     }
 
 
@@ -70,23 +76,37 @@ public class Population
         int min = nOfBits;
         int max = 0;
         int tempFitness;
+        string bestIndividuals = "";
+
 
         for (int p = 0; p < popSize; p++)
         {
             tempFitness = population[p].fitness;
+
             sum += tempFitness;
             min = (tempFitness < min) ? tempFitness : min;
-            max = (tempFitness > max) ? tempFitness : max;
+
+            if(tempFitness > max)
+            {
+                max = tempFitness;
+                bestIndividuals = p.ToString();
+            }
+            else if(tempFitness == max)
+            {
+                bestIndividuals += ", " + p.ToString();
+            }
         }
 
         if (numbersOnly)
         {
-            Console.WriteLine("{4},{0},{1},{2}", min, max, sum / popSize, this.name, generation);
+            Console.WriteLine("{0},{1},{2},{3}", generation, min, max, sum / popSize);
         }
         else
         {
-            Console.WriteLine("{4}. {3} population:\t Min) {0}\t Max) {1}\t Mean) {2}.", min, max, sum / popSize, this.name, generation);
+            Console.WriteLine("{0}. {1} population:\t Min) {2}\t Max) {3}\t Mean) {4}.", generation, this.name, min, max, sum / popSize);
         }
+
+
     }
 
     public void TournamentSelection(Population offspringPopulation, bool display)
@@ -111,11 +131,38 @@ public class Population
                 newParent = parent2;
             }
 
-            for(int g = 0; g< nOfBits; g++)
+            for (int g = 0; g < nOfBits; g++)
             {
                 offspringPopulation.population[p].gene[g] = population[newParent].gene[g];
             }
             offspringPopulation.population[p].fitness = population[p].fitness;
+        }
+    }
+
+    public void RouletteWheelSelection(Population offspringPopulation)
+    {
+        //Console.WriteLine(totalFitness);
+        int selectionPoint;
+        int runningTotal;
+        int j;
+
+        for(int p = 0; p < popSize; p++)
+        {
+            selectionPoint = random.Next() % totalFitness;
+            runningTotal = 0;
+            j = 0;
+
+            while(runningTotal <= selectionPoint)
+            {
+                runningTotal += population[j].fitness;
+                j++;
+            }
+            
+            for(int g = 0; g < nOfBits; g++)
+            {
+                offspringPopulation.population[p].gene[g] = population[j - 1].gene[g];
+            }
+            offspringPopulation.population[p].fitness = population[j - 1].fitness;
         }
     }
 
