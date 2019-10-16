@@ -11,7 +11,7 @@ public class Population
     public int popSize;
     public int nOfBits;
     int mutationThreshold;
-    int totalFitness;
+    double totalFitness;
 
     public Population(string populationName, int pop, int nBits, int threshold)
     {
@@ -39,11 +39,13 @@ public class Population
 
     public void EvaluateFitness()
     {
-        int sum = 0;
+        double sum = 0;
 
         for (int p = 0; p < popSize; p++)
         {
-            population[p].FitnessCountingOnes();
+            //population[p].FitnessCountingOnes();
+            //population[p].FitnessXsquared();
+            population[p].FitnessBinaryEncoded();
             sum += population[p].fitness;
         }
 
@@ -72,10 +74,10 @@ public class Population
 
     public void DisplayFitnessStats(int generation, bool numbersOnly)
     {
-        float sum = 0;    //for the average
-        int min = nOfBits;
-        int max = 0;
-        int tempFitness;
+        double sum = 0;    //for the average
+        double min = -1;
+        double max = -1;
+        double tempFitness;
         string bestIndividuals = "";
 
 
@@ -84,9 +86,20 @@ public class Population
             tempFitness = population[p].fitness;
 
             sum += tempFitness;
-            min = (tempFitness < min) ? tempFitness : min;
+            if(min == -1)
+            {
+                min = tempFitness;
+            }
+            else
+            {
+                min = (tempFitness < min) ? tempFitness : min;
+            }
 
-            if(tempFitness > max)
+            if(max == -1)
+            {
+                max = tempFitness;
+            }
+            else if (tempFitness > max)
             {
                 max = tempFitness;
                 bestIndividuals = p.ToString();
@@ -99,7 +112,7 @@ public class Population
 
         if (numbersOnly)
         {
-            Console.WriteLine("{0},{1},{2},{3}", generation, min, max, sum / popSize);
+            Console.WriteLine("{0},{1},{2},{3}", generation, min.ToString("0.00"), max.ToString("0.00"), (sum / popSize).ToString("0.00"));
         }
         else
         {
@@ -143,12 +156,12 @@ public class Population
     {
         //Console.WriteLine(totalFitness);
         int selectionPoint;
-        int runningTotal;
+        double runningTotal;
         int j;
 
         for(int p = 0; p < popSize; p++)
         {
-            selectionPoint = random.Next() % totalFitness;
+            selectionPoint = random.Next() % (int)totalFitness;
             runningTotal = 0;
             j = 0;
 
